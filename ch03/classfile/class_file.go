@@ -1,5 +1,7 @@
 package classfile
 
+import "fmt"
+
 type ClassFile struct {
 	magic        uint32
 	minorVersion uint16
@@ -15,7 +17,19 @@ type ClassFile struct {
 }
 
 func Parse(classData []byte) (cf *ClassFile, err error) {
-
+	defer func() {
+		if r := recover(); r != nil {
+			var ok bool
+			err, ok = r.(error)
+			if !ok {
+				err = fmt.Errorf("%v", r)
+			}
+		}
+	}()
+	cr := &ClassReader{classData}
+	cf = &ClassFile{}
+	cf.read(cr)
+	return
 }
 
 func (self *ClassFile) read(reader *ClassReader) {
@@ -79,7 +93,7 @@ func (self *ClassFile) SuperClassName() string {
 	return ""
 }
 func (self *ClassFile) InterfaceNames() []string {
-	interfaceNames := make([]string,len(self.interfaces))
+	interfaceNames := make([]string, len(self.interfaces))
 	for i, cpIndex := range self.interfaces {
 		interfaceNames[i] = self.constantPool.getClassName(cpIndex)
 	}
