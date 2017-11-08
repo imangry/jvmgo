@@ -34,6 +34,3 @@ func (self *MemberInfo) Descriptor() string {
 	return self.cp.getUtf8(self.descriptorIndex)
 }
 
-func readAttributes(reader *ClassReader, cp ConstantPool) []AttributeInfo {
-
-}
